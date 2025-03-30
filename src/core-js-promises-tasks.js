@@ -17,8 +17,14 @@
  * 0    => promise that will be fulfilled
  * 1    => promise that will be fulfilled
  */
-function getPromise(/* number */) {
-  throw new Error('Not implemented');
+function getPromise(number) {
+  return new Promise((resolve, rejected) => {
+    if (number >= 0) {
+      resolve();
+    } else {
+      rejected();
+    }
+  });
 }
 
 /**
@@ -88,8 +94,12 @@ function getFirstPromiseResult(/* promises */) {
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)] => Promise rejected with 2
  */
-function getAllOrNothing(/* promises */) {
-  throw new Error('Not implemented');
+function getAllOrNothing(promises) {
+  return Promise.allSettled(promises).then((res) =>
+    res.every((el) => el.status === 'fulfilled')
+      ? res
+      : Promise.reject(res.filter((el) => el.status === 'rejected')[0].reason)
+  );
 }
 
 /**
@@ -104,8 +114,10 @@ function getAllOrNothing(/* promises */) {
  * [Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)] => Promise fulfilled with [1, 2, 3]
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)]  => Promise fulfilled with [1, null, 3]
  */
-function getAllResult(/* promises */) {
-  throw new Error('Not implemented');
+function getAllResult(promises) {
+  return Promise.allSettled(promises).then((res) =>
+    res.map((el) => (el.status === 'fulfilled' ? el.value : null))
+  );
 }
 
 /**
@@ -126,8 +138,16 @@ function getAllResult(/* promises */) {
  * [promise1, promise4, promise3] => Promise.resolved('104030')
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
-function queuePromises(/* promises */) {
-  throw new Error('Not implemented');
+function queuePromises(promises) {
+  let res = '';
+  return new Promise((resolve) => {
+    promises.forEach((promise) => {
+      promise.then((data) => {
+        res += data;
+      });
+    });
+    resolve(res);
+  }).then(() => res);
 }
 
 module.exports = {
