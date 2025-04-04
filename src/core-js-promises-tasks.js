@@ -39,8 +39,18 @@ function getPromise(number) {
  * Promise.resolve('success') => promise that will be fulfilled with 'success' value
  * Promise.reject('fail')     => promise that will be fulfilled with 'fail' value
  */
-function getPromiseResult(/* source */) {
-  throw new Error('Not implemented');
+function getPromiseResult(source) {
+  return source
+    .then(() => {
+      return new Promise((resolve) => {
+        resolve('success');
+      });
+    })
+    .catch(() => {
+      return new Promise((resolve) => {
+        resolve('fail');
+      });
+    });
 }
 
 /**
@@ -56,8 +66,8 @@ function getPromiseResult(/* source */) {
  * [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)]  => Promise fulfilled with 1
  * [Promise.reject(1), Promise.reject(2), Promise.reject(3)]    => Promise rejected
  */
-function getFirstResolvedPromiseResult(/* promises */) {
-  throw new Error('Not implemented');
+function getFirstResolvedPromiseResult(promises) {
+  return Promise.any(promises);
 }
 
 /**
@@ -79,8 +89,8 @@ function getFirstResolvedPromiseResult(/* promises */) {
  * [promise3, promise6, promise2] => Promise rejected with 2
  * [promise3, promise4, promise6] => Promise rejected with 6
  */
-function getFirstPromiseResult(/* promises */) {
-  throw new Error('Not implemented');
+function getFirstPromiseResult(promises) {
+  return Promise.race(promises);
 }
 
 /**
@@ -138,16 +148,19 @@ function getAllResult(promises) {
  * [promise1, promise4, promise3] => Promise.resolved('104030')
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
-function queuePromises(promises) {
-  let res = '';
-  return new Promise((resolve) => {
-    promises.forEach((promise) => {
-      promise.then((data) => {
-        res += data;
+async function queuePromises(promises) {
+  const res = [];
+  async function getData() {
+    for (let i = 0; i < promises.length; i += 1) {
+      promises[i].then((r) => {
+        res.push(r);
       });
-    });
-    resolve(res);
-  }).then(() => res);
+    }
+    return res;
+  }
+
+  const response = await getData();
+  return response;
 }
 
 module.exports = {
