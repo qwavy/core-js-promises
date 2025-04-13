@@ -149,18 +149,18 @@ function getAllResult(promises) {
  * [promise1, promise4, promise3, promise2] => Promise.resolved('10403020')
  */
 async function queuePromises(promises) {
-  const res = [];
-  async function getData() {
-    for (let i = 0; i < promises.length; i += 1) {
-      promises[i].then((r) => {
-        res.push(r);
-      });
-    }
-    return res;
-  }
+  let res = '';
+  let i = 0;
 
-  const response = await getData();
-  return response;
+  async function recurse(prom) {
+    if (i >= promises.length) {
+      return res;
+    }
+    res += await prom;
+    i += 1;
+    return recurse(promises[i]);
+  }
+  return recurse(promises[i]);
 }
 
 module.exports = {
